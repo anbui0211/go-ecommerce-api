@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email OTP</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #333333;
+      }
+      p {
+        font-size: 16px;
+        color: #555555;
+      }
+      .otp {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4caf50;
+        margin: 20px 0;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #999999;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Xin chào,</h2>
+      <p>
+        Cảm ơn bạn đã đăng ký tài khoản. Mã OTP của bạn để xác thực tài khoản
+        là:
+      </p>
+      <div class="otp">{{ .OTP_CODE }}</div>
+      <p>
+        Mã này sẽ hết hạn sau 5 phút. Vui lòng không chia sẻ mã OTP này cho bất
+        kỳ ai.
+      </p>
+      <p>Nếu bạn không yêu cầu đăng ký tài khoản, vui lòng bỏ qua email này.</p>
+      <div class="footer">
+        <p>Trân trọng,<br />Đội ngũ Hỗ trợ</p>
+      </div>
+    </div>
+  </body>
+</html>

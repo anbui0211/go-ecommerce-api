@@ -1,0 +1,11 @@
+@baseUrl=http://localhost:8002/v1/2024
+
+
+POST {{baseUrl}}/user/register
+Content-Type: application/json
+
+{
+  "verify_key": "anbui.academic@gmail.com",
+  "verify_purpose": "TEST_USER",
+  "verify_type": 1
+}

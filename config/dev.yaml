@@ -1,0 +1,25 @@
+# Sử dụng file này khi build build docker compose cho cả server backend
+server:
+  port: 8082
+  mode: "dev"
+mysql:
+  host: mysql_container # 127.0.0.1
+  port: 3306 # 33306
+  username: root
+  password: root1234
+  dbname: shopdevgo
+  maxIdleConns: 10 # Số lượng kế nối Idle tối đa được phép trong pool connect
+  maxOpenConns: 100 # Số lượng kết nối mở tối đa có thể
+  connMaxLifetime: 3600 # vòng đời tối đa của 1 connect (s)
+logger:
+  log_level: debug
+  file_log_name: "./storages/logs/dev.xxx.log"
+  max_size: 500 #  Kích thước tối đa (megabytes) trước khi xoay vòng log
+  max_backups: 3 # Số lượng tệp log cũ tối đa để giữ lại
+  max_age: 28 # Số ngày tối đa để giữ lại tệp log cũ (days)
+  compress: true # Có nén các tệp log cũ hay không
+redis:
+  host: redis_container # 127.0.0.1
+  port: 6379 # 6381
+  password:
+  database: 0

@@ -1,0 +1,2 @@
+# Check status docker compose
+GET http://localhost:8008/v1/2024/checkStatus
