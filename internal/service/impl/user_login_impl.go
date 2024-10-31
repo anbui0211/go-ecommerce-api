@@ -143,6 +143,59 @@ func (s *sUserLogin) VerifyOTP(ctx context.Context, in *model.VerifyInput) (out 
 	return out, err
 }
 
-func (s *sUserLogin) UpdatePasswordRegister(ctx context.Context) error {
-	panic("unimplemented")
+func (s *sUserLogin) UpdatePasswordRegister(ctx context.Context, token string, password string) (userId int, err error) {
+	// 1. token is already verified. : user_verify table
+	infoOTP, err := s.r.GetInfoOTP(ctx, token)
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	// check isVerified OK
+	if infoOTP.IsVerified.Int32 == 0 {
+		return response.ErrCodeUserOtpNotExists, fmt.Errorf("user OTP not verified")
+	}
+
+	// update user_base table
+	userBase := database.AddUserBaseParams{}
+	userBase.UserAccount = infoOTP.VerifyKey
+	userSalt, err := crypto.GenerateSalt(16)
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+	userBase.UserSalt = userSalt
+	userBase.UserPassword = crypto.HashPassword(password, userSalt)
+
+	// add userBase to user_base table
+	newUserBase, err := s.r.AddUserBase(ctx, userBase)
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+	user_id, err := newUserBase.LastInsertId()
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	// add user_id to user_info table
+	newUserInfo, err := s.r.AddUserHaveUserId(ctx, database.AddUserHaveUserIdParams{
+		UserID:               uint64(user_id),
+		UserAccount:          infoOTP.VerifyKey,
+		UserNickname:         sql.NullString{String: infoOTP.VerifyKey, Valid: true},
+		UserAvatar:           sql.NullString{String: "", Valid: true},
+		UserState:            1,
+		UserMobile:           sql.NullString{String: "", Valid: true},
+		UserGender:           sql.NullInt16{Int16: 0, Valid: true},
+		UserBirthday:         sql.NullTime{Time: time.Time{}, Valid: false},
+		UserEmail:            sql.NullString{String: infoOTP.VerifyKey, Valid: true},
+		UserIsAuthentication: 1,
+	})
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	user_id, err = newUserInfo.LastInsertId()
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	return int(user_id), nil
 }
