@@ -77,3 +77,29 @@ func (c *cUserLogin) VerifyOTP(ctx *gin.Context) {
 
 	response.SuccessResponse(ctx, response.ErrorCodeSuccess, result)
 }
+
+// Update Password Register
+// @Summary      Update Password Register
+// @Description  Update Password Register
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.UpdatePasswordRegisterInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/update_pass_register [post]
+func (c *cUserLogin) UpdatePasswordRegister(ctx *gin.Context) {
+	var params model.UpdatePasswordRegisterInput
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		response.ErrorResponse(ctx, response.ErrorCodeParamInvalid, err.Error())
+		return
+	}
+
+	result, err := service.UserLogin().UpdatePasswordRegister(ctx, params.UserToken, params.UserPassword)
+	if err != nil {
+		response.ErrorResponse(ctx, result, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, response.ErrorCodeSuccess, result)
+}

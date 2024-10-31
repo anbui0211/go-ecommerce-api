@@ -64,6 +64,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/update_pass_register": {
+            "post": {
+                "description": "Update Password Register",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "account management"
+                ],
+                "summary": "Update Password Register",
+                "parameters": [
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdatePasswordRegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ResponseData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/user/verify_account": {
             "post": {
                 "description": "Verify OTP Login By User",
@@ -117,6 +157,17 @@ const docTemplate = `{
                 },
                 "verify_type": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.UpdatePasswordRegisterInput": {
+            "type": "object",
+            "properties": {
+                "user_password": {
+                    "type": "string"
+                },
+                "user_token": {
+                    "type": "string"
                 }
             }
         },

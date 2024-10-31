@@ -1,4 +1,4 @@
--- nаmе: GetOneUserInfo :one
+-- name: GetOneUserInfo :one
 SELECT
     user_id,
     user_account,
@@ -7,7 +7,7 @@ SELECT
 FROM `pre_go_acc_user_base_9999`
 WHERE user_account = ?;
 
--- nаmе: GetOneUserInfoAdmin :one
+-- name: GetOneUserInfoAdmin :one
 SELECT user_id,
     user_account,
     user_password,
@@ -25,8 +25,8 @@ SELECT COUNT(*)
 FROM `pre_go_acc_user_base_9999`
 WHERE user_account = ?;
 
--- nаmе: AddUserBase :execresult
-INSERT INTO `ßpre_go_acc_user_base_9999` (
+-- name: AddUserBase :execresult
+INSERT INTO `pre_go_acc_user_base_9999` (
   user_account,
   user_password,
   user_salt,
