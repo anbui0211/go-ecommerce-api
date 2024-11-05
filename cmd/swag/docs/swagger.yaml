@@ -1,5 +1,12 @@
 basePath: /v1/2024
 definitions:
+  model.LoginInput:
+    properties:
+      user_account:
+        type: string
+      user_password:
+        type: string
+    type: object
   model.RegisterInput:
     properties:
       verify_key:
@@ -53,6 +60,32 @@ info:
   title: API Documentation Ecommerce Backend SHOPDEV
   version: 1.0.0
 paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: User Login
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ResponseData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseData'
+      summary: User Login
+      tags:
+      - account management
   /user/register:
     post:
       consumes:
