@@ -15,15 +15,6 @@ var Login = new(cUserLogin)
 
 type cUserLogin struct{}
 
-func (c *cUserLogin) Login(ctx *gin.Context) {
-	err := service.UserLogin().Login(ctx)
-	if err != nil {
-		response.ErrorResponse(ctx, response.ErrorCodeParamInvalid, err.Error())
-		return
-	}
-	response.SuccessResponse(ctx, response.ErrorCodeSuccess, nil)
-}
-
 // User Register document
 // @Summary      User Register
 // @Description  When user is registered send otp to email
@@ -102,4 +93,29 @@ func (c *cUserLogin) UpdatePasswordRegister(ctx *gin.Context) {
 	}
 
 	response.SuccessResponse(ctx, response.ErrorCodeSuccess, result)
+}
+
+// User Login
+// @Summary      User Login
+// @Description  User Login
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.LoginInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/login [post]
+func (c *cUserLogin) Login(ctx *gin.Context) {
+	var params model.LoginInput
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		response.ErrorResponse(ctx, response.ErrorCodeParamInvalid, err.Error())
+		return
+	}
+
+	codeRs, dataRs, err := service.UserLogin().Login(ctx, &params)
+	if err != nil {
+		response.ErrorResponse(ctx, response.ErrorCodeParamInvalid, err.Error())
+		return
+	}
+	response.SuccessResponse(ctx, codeRs, dataRs)
 }

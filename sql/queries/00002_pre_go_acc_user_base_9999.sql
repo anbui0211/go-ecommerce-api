@@ -36,7 +36,7 @@ INSERT INTO `pre_go_acc_user_base_9999` (
   ?, ?, ?, NOW(), NOW()
 );
 
--- паmе: LoginUserBase :exec
+-- name: LoginUserBase :exec
 UPDATE `pre_go_acc_user_base_9999`
 SET
     user_login_time = NOW(), user_login_ip = ?

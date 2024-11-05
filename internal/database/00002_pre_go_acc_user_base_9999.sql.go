@@ -105,6 +105,25 @@ func (q *Queries) GetOneUserInfoAdmin(ctx context.Context, userAccount string) (
 	return i, err
 }
 
+const loginUserBase = `-- name: LoginUserBase :exec
+UPDATE ` + "`" + `pre_go_acc_user_base_9999` + "`" + `
+SET
+    user_login_time = NOW(), user_login_ip = ?
+WHERE
+    user_account = ? AND user_password = ?
+`
+
+type LoginUserBaseParams struct {
+	UserLoginIp  sql.NullString
+	UserAccount  string
+	UserPassword string
+}
+
+func (q *Queries) LoginUserBase(ctx context.Context, arg LoginUserBaseParams) error {
+	_, err := q.db.ExecContext(ctx, loginUserBase, arg.UserLoginIp, arg.UserAccount, arg.UserPassword)
+	return err
+}
+
 const logoutUserBase = `-- name: LogoutUserBase :exec
 UPDATE ` + "`" + `pre_go_acc_user_base_9999` + "`" + `
 SET user_logout_time = NOW()

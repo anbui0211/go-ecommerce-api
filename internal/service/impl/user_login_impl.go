@@ -8,10 +8,12 @@ import (
 	"ecommerce/internal/database"
 	"ecommerce/internal/model"
 	"ecommerce/internal/utils"
+	"ecommerce/internal/utils/auth"
 	"ecommerce/internal/utils/crypto"
 	"ecommerce/internal/utils/random"
 	"ecommerce/internal/utils/sendto"
 	"ecommerce/pkg/response"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -30,8 +32,53 @@ func NewUserLoginImpl(r *database.Queries) *sUserLogin {
 	return &sUserLogin{r: r}
 }
 
-func (s *sUserLogin) Login(ctx context.Context) error {
-	return nil
+func (s *sUserLogin) Login(ctx context.Context, in *model.LoginInput) (codeResult int, out model.LoginOutput, err error) {
+	// logic login
+	userBase, err := s.r.GetOneUserInfo(ctx, in.UserAccount)
+	if err != nil {
+		return response.ErrorCodeAuthFailed, out, err
+	}
+
+	// 2. check password
+	if !crypto.MatchingPassword(userBase.UserPassword, in.UserPassword, userBase.UserSalt) {
+		return response.ErrorCodeAuthFailed, out, fmt.Errorf("does not match password")
+	}
+
+	// 3. check two-factor authentication
+	// 4.update password time
+	go s.r.LoginUserBase(ctx, database.LoginUserBaseParams{
+		UserLoginIp:  sql.NullString{String: "127.0.0.1", Valid: true}, // IP temp
+		UserAccount:  in.UserAccount,
+		UserPassword: in.UserPassword,
+	})
+
+	// 5. Create UUID user
+	subToken := utils.GenerateUUID(int(userBase.UserID))
+
+	// 6. Get user_info table
+	infoUser, err := s.r.GetUser(ctx, uint64(userBase.UserID))
+	if err != nil {
+		return response.ErrorCodeAuthFailed, out, err
+	}
+
+	// convert to json to save in redis
+	infoUserJson, err := json.Marshal(infoUser)
+	if err != nil {
+		return response.ErrorCodeAuthFailed, out, fmt.Errorf("convert to json failed: %v", err)
+	}
+
+	// 7. Give infoUserJson to redis with key = subToken
+	if err = global.Rdb.Set(ctx, subToken, infoUserJson, time.Duration(consts.TIME_OTP_REGISTER)*time.Minute).Err(); err != nil {
+		return response.ErrorCodeAuthFailed, out, err
+	}
+
+	// 8. Create token
+	out.Token, err = auth.CrateToken(subToken)
+	if err != nil {
+		return
+	}
+
+	return 200, out, nil
 }
 
 func (s *sUserLogin) Register(ctx context.Context, in *model.RegisterInput) (codeResult int, err error) {
